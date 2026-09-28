@@ -5,3 +5,4 @@ scikit-learn
 joblib
 plotly
 huggingface_hub
+huggingface_hub

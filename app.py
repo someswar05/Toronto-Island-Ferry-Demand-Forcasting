@@ -8,6 +8,7 @@ import warnings
 from datetime import datetime, timedelta
 
 import joblib
+from huggingface_hub import hf_hub_download
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -69,6 +70,8 @@ HORIZON_MINUTES = {
     "2 Hours": 120
 }
 
+# Hugging Face model repository
+MODEL_REPO_ID = "someswar05/toronto-ferry-demand-models"
 
 # ============================================================
 # FEATURE CONFIGURATION
@@ -276,13 +279,15 @@ def load_data():
 # ============================================================
 
 @st.cache_resource
-def load_model(model_path):
+def load_model(model_filename):
 
-    if not os.path.exists(model_path):
-        raise FileNotFoundError(
-            f"Model module not found:\n{model_path}"
-        )
+    # Download the selected model from Hugging Face
+    model_path = hf_hub_download(
+        repo_id=MODEL_REPO_ID,
+        filename=model_filename
+    )
 
+    # Load the downloaded Random Forest model
     model = joblib.load(model_path)
 
     return model
@@ -748,16 +753,11 @@ model_filename = MODEL_FILES[
     selected_horizon
 ]
 
-model_path = os.path.join(
-    MODULES_DIR,
-    model_filename
-)
-
 
 try:
 
     model = load_model(
-        model_path
+        model_filename
     )
 
 except Exception as e:
